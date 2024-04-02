@@ -1,7 +1,9 @@
 <div align=center>  
+  
   # betterPYAV   
      
-  **better Python Antivirus**   
+  **better Python Antivirus/Scanner using local Hashes and api(s)**   
+  
 </div>
 
 ## Features
