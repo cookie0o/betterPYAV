@@ -1,4 +1,3 @@
-# betterPYAV
 <div align=center>  
   # betterPYAV
   **better Python Antivirus**
