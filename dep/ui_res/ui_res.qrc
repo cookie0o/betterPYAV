@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="logo">
+    <file>logo/logo.ico</file>
+    <file>logo/logo_dark.svg</file>
+    <file>logo/logo_light.svg</file>
+  </qresource>
+  <qresource prefix="icons">
+    <file>icons/homepage_dark.svg</file>
+    <file>icons/homepage_light.svg</file>
+    <file>icons/settingspage_dark.svg</file>
+    <file>icons/settingspage_light.svg</file>
+  </qresource>
+</RCC>
