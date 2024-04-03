@@ -5,15 +5,16 @@ import time
 import os
 
 class HashWorker(QRunnable):
-    finished = pyqtSignal()
     def __init__(self, self_, current_dir):
         super().__init__()
         self.self_ = self_
         self.current_dir = current_dir
 
     def run(self):
+        self.self_.changePage("LoadingPage", "Updating Hashes")
         if self.self_.UpdateHashes_checkBox.isChecked():
             self.UpdateHashes_MalwareBazaar()
+        self.self_.changePage("HomePage")
 
 
     def UpdateHashes_MalwareBazaar(self):
