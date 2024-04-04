@@ -1,0 +1,5 @@
+configparser==6.0.0
+pyqt5== 5.15.9
+pyqtdarktheme==2.1.0
+vt-py==0.18.0
+MetaDefender-api==1.0.2
