@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QRunnable, pyqtSignal
+from PyQt5.QtCore import QRunnable
 import urllib.request
 import zipfile
 import time

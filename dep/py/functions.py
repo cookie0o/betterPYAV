@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
-from PyQt5.QtCore import QThread
 import webbrowser
+import hashlib
+import os
 
 def openLinkDialog(link):
     dlg = QMessageBox()
@@ -36,7 +37,11 @@ def changePage(self, page, LoadingReason="Loading..."):
 def FileDialog(self, MainWindow):
     options = QFileDialog.Options()
     file_path, _ = QFileDialog.getOpenFileName(MainWindow, "Open File", "", "All Files (*);;Text Files (*.txt)", options=options)
-    return file_path
+    if os.path.exists(file_path):
+        return file_path
+    else:
+        self.ErrorBox("Path selected is not valid or does not exist", (self.def_data()), "File Dialog Error")
+        return None
 
 
 def ErrorBox(self, Error, def_data, Title="Error"):
@@ -57,3 +62,32 @@ def ErrorBox(self, Error, def_data, Title="Error"):
     # show Error Box
     error_box.exec_()
     return
+
+
+def get_Hashes(self, filepath):
+    # get the MD5, SHA1 and SHA-256 hash of a file
+    md5_hash = hashlib.md5()
+    sha1_hash = hashlib.sha1()
+    sha256_hash = hashlib.sha256()
+
+    with open(filepath, "rb") as f:
+        # Read the file in chunks to efficiently handle large files
+        chunk = 0
+        while chunk := f.read(4096):
+            md5_hash.update(chunk)
+            sha1_hash.update(chunk)
+            sha256_hash.update(chunk)
+
+    return {
+        md5_hash.hexdigest(),
+        sha1_hash.hexdigest(),
+        sha256_hash.hexdigest()
+    }
+
+
+# check if a hash is MD5 using its default length
+def is_MD5_hash(self, hash):
+    if len(str(hash)) == 32:
+        return True
+    else:
+        return False
