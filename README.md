@@ -13,4 +13,4 @@
 - scanning using Meta Defender
 - scanning using hashes from MalwareBazaar
 
-![image](https://github.com/cookie0o/betterPYAV/assets/81589649/166137eb-ab6e-4043-9c8e-a64c3eba30a0)
+![image](https://github.com/cookie0o/betterPYAV/assets/81589649/fc6d5ddd-428a-4891-9833-bf175c1a0a4f)
