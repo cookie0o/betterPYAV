@@ -1,10 +1,10 @@
 from MetaDefender.api import MetaDefender_api
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal
 import asyncio
 import os
 import vt
 
-class ScanWorker(QObject):
+class ScanWorker(QThread):
     finished = pyqtSignal()
     def __init__(self, self_, current_dir, input_arg, type):
         super().__init__()
@@ -25,6 +25,7 @@ class ScanWorker(QObject):
             ScanTypes.File_Hash_Scan(self, self.self_, self.current_dir, self.input_arg, self.type)
 
         # show Ui
+        self.self_.changePage("ResultsPage")
         self.finished.emit()
 
 class ScanTypes():
@@ -61,6 +62,7 @@ class ScanTypes():
                 self_.ErrorBox("No valid Filepath or Hash submitted.", (self_.def_data()), "Scan Error")
                 # fatal Error go to Home Page
                 self_.changePage("HomePage")
+                self.finished.emit()
                 return
 
 
@@ -70,76 +72,110 @@ class ScanTypes():
                 # check if the hash is MD5 if not dont check with local MD5 hashes
                 if self_.is_MD5_hash(hash):
                     HashScan_found, hash = scanning.HashScan(self, self_, current_dir, hash)
-                # check if scan was successful
-                if HashScan_found==None:self_.HashCheck_noInput_checkBox.setChecked(False)
-                else: self_.HashCheck_noInput_checkBox.setChecked(True)
-                
+             
             if self_.Method_VirusTotal_checkBox.isChecked():
                 VirusTotal_found, hash = scanning.VirusTotalScan(self, self_, current_dir, filepath, hash)
-                # check if scan was successful
-                if VirusTotal_found==None:self_.VirusTotalCheck_noInput_checkBox.setChecked(False)
-                else: self_.VirusTotalCheck_noInput_checkBox.setChecked(True)  
 
             if self_.Method_MetaDefender_checkBox.isChecked():
                 MetaDefender_found, hash = scanning.MetaDefenderScan(self, self_, current_dir, filepath, hash)
-                # check if scan was successful
-                if MetaDefender_found==None:self_.MetaDefenderCheck_noInput_checkBox.setChecked(False)
-                else: self_.MetaDefenderCheck_noInput_checkBox.setChecked(True)  
 
             
             # detection
             if HashScan_found != None and HashScan_found != False:
+                self_.HashCheck_noInput_checkBox.setChecked(True)
                 self_.HashCheckDetection_noInput_checkBox.setChecked(True)
                 self_.HashCheckDetection_noInput_checkBox.setStyleSheet("color: red")
-            else:
-                self_.HashCheckDetection_noInput_checkBox.setChecked(False)
-                self_.HashCheckDetection_noInput_checkBox.setStyleSheet("")
-                
-            if VirusTotal_found != None and VirusTotal_found != False:
-                self_.VirusTotal_harmless_results_label.setText(str(VirusTotal_found["harmless"]))
-                self_.VirusTotal_harmless_results_label.setStyleSheet("color: green;")
-                self_.VirusTotal_malicious_results_label.setText(str(VirusTotal_found["malicious"]))
-                self_.VirusTotal_suspicious_results_label.setText(str(VirusTotal_found["suspicious"]))
-                self_.VirusTotal_timeout_results_label.setText(str(VirusTotal_found["timeout"]))
-                self_.VirusTotal_unsupported_results_label.setText(str(VirusTotal_found["type-unsupported"]))
-                self_.VirusTotal_undetected_results_label.setText(str(VirusTotal_found["undetected"]))
-                self_.VirusTotal_failure_results_label.setText(str(VirusTotal_found["failure"]))
-            else:
-                self_.VirusTotal_harmless_results_label.setText("No Results. - VirusTotal Disabled / API down?")
-                self_.VirusTotal_harmless_results_label.setStyleSheet("")
-                self_.VirusTotal_malicious_results_label.setText("")
-                self_.VirusTotal_suspicious_results_label.setText("")
-                self_.VirusTotal_timeout_results_label.setText("")
-                self_.VirusTotal_unsupported_results_label.setText("")
-                self_.VirusTotal_undetected_results_label.setText("")
-                self_.VirusTotal_failure_results_label.setText("")
 
+            else:
+                if HashScan_found == False:
+                    self_.HashCheck_noInput_checkBox.setChecked(True)
+                else:
+                    self_.HashCheck_noInput_checkBox.setChecked(False)
+                self_.HashCheck_noInput_checkBox.setChecked(True)
+                self_.HashCheckDetection_noInput_checkBox.setChecked(False)
+                self_.HashCheckDetection_noInput_checkBox.setStyleSheet("color: green")
+                
+
+            VirusTotal_name = [
+                "harmless", "malicious", "suspicious", "timeout", "unsupported", "undetected", "failure"
+            ]
+            if VirusTotal_found != None and VirusTotal_found != False:
+                self_.VirusTotalCheck_noInput_checkBox.setChecked(True)
+                VirusTotal_labels = [
+                    (str(VirusTotal_found["harmless"]), "color: green;"),
+                    (str(VirusTotal_found["malicious"]), "color: red;"),
+                    (str(VirusTotal_found["suspicious"]), "color: orange;"),
+                    (str(VirusTotal_found["timeout"]), ""),
+                    (str(VirusTotal_found["type-unsupported"]), ""),
+                    (str(VirusTotal_found["undetected"]), ""),
+                    (str(VirusTotal_found["failure"]), ""),
+                ]
+                for i, (label, style_sheet) in enumerate(VirusTotal_labels):
+                    getattr(self_, f"VirusTotal_{VirusTotal_name[i]}_results_label").setText(label)
+                    getattr(self_, f"VirusTotal_{VirusTotal_name[i]}_results_label").setStyleSheet(style_sheet)
+
+            else:
+                if VirusTotal_found == False:
+                    self_.VirusTotalCheck_noInput_checkBox.setChecked(True)
+                else:
+                    self_.VirusTotalCheck_noInput_checkBox.setChecked(False)
+                VirusTotal_labels = [
+                    ("No Results. - VirusTotal Disabled / API down?", ""),
+                    ("", ""),
+                    ("", ""),
+                    ("", ""),
+                    ("", ""),
+                    ("", ""),
+                    ("", ""),
+                ]
+                for i, (label, style_sheet) in enumerate(VirusTotal_labels):
+                    getattr(self_, f"VirusTotal_{VirusTotal_name[i]}_results_label").setText(label)
+                    getattr(self_, f"VirusTotal_{VirusTotal_name[i]}_results_label").setStyleSheet(style_sheet)
+
+
+            MetaDefender_name = [
+                "EngineDetections", "Engines", "DetectionPercentage", "UserVotesMalicious", "UserVotesHarmless"
+            ]
             if MetaDefender_found != None and MetaDefender_found != False:
-                self_.MetaDefender_EngineDetections_results_label.setText(str(MetaDefender_found[0]))
-                self_.MetaDefender_EngineDetections_results_label.setStyleSheet("color: red;")
-                self_.MetaDefender_Engines_results_label.setText(str(MetaDefender_found[1]))
-                self_.MetaDefender_DetectionPercentage_results_label.setText(str(MetaDefender_found[2]+"%"))
-                self_.MetaDefender_UserVotesMalicious_results_label.setText(str(MetaDefender_found[3]))
-                self_.MetaDefender_UserVotesHarmless_results_label.setText(str(MetaDefender_found[4]))
+                self_.MetaDefenderCheck_noInput_checkBox.setChecked(True)
+                MetaDefender_labels = [
+                    (str(MetaDefender_found[0]), "color: red;"),
+                    (str(MetaDefender_found[1]), ""),
+                    (str(MetaDefender_found[2]+"%"), "color: green;"),
+                    (str(MetaDefender_found[3]), "color: orange;"),
+                    (str(MetaDefender_found[4]), "color: green;"),
+                ]
+                for i, (label, style_sheet) in enumerate(MetaDefender_labels):
+                    getattr(self_, f"MetaDefender_{MetaDefender_name[i]}_results_label").setText(label)
+                    getattr(self_, f"MetaDefender_{MetaDefender_name[i]}_results_label").setStyleSheet(style_sheet)
+                # dynamic color
                 if int(MetaDefender_found[2]) > 50:
                     self_.MetaDefender_DetectionPercentage_results_label.setStyleSheet("color: red")
                     self_.label_31.setStyleSheet("color: red")
-                else:
-                    self_.HashCheckDetection_noInput_checkBox.setStyleSheet("color: green")
-                    self_.label_31.setStyleSheet("color: green")
+
             else:
-                self_.MetaDefender_EngineDetections_results_label.setText("No Results. - Meta Defender Disabled / API down?")
-                self_.MetaDefender_EngineDetections_results_label.setStyleSheet("")
-                self_.MetaDefender_Engines_results_label.setText("")
-                self_.MetaDefender_DetectionPercentage_results_label.setText("")
-                self_.MetaDefender_UserVotesMalicious_results_label.setText("")
-                self_.MetaDefender_UserVotesHarmless_results_label.setText("")
+                if MetaDefender_found == False:
+                    self_.MetaDefenderCheck_noInput_checkBox.setChecked(True)
+                else:
+                    self_.MetaDefenderCheck_noInput_checkBox.setChecked(False)
+                MetaDefender_labels = [
+                    ("No Results. - Meta Defender Disabled / API down?", ""),
+                    ("", ""),
+                    ("", ""),
+                    ("", ""),
+                    ("", ""),
+                ]
+                for i, (label, style_sheet) in enumerate(MetaDefender_labels):
+                    getattr(self_, f"MetaDefender_{MetaDefender_name[i]}_results_label").setText(label)
+                    getattr(self_, f"MetaDefender_{MetaDefender_name[i]}_results_label").setStyleSheet(style_sheet)
+
+
             return
-            
         except Exception as e:
             self_.ErrorBox(e, (self_.def_data()), "Scan Error")
             # fatal Error go to Home Page
             self_.changePage("HomePage")
+            self.finished.emit()
             return
 
 
@@ -148,14 +184,15 @@ class scanning():
     def HashScan(self, self_, current_dir, hash=None):
         HashScan_found = False
         try:
-            self_.changePage("LoadingPage", "Hash Scan.")
+            self_.changePage("LoadingPage", "Hash Scan")
             
             # check the hash
-            for i in range(1, 2):
-                hash_file_path = current_dir+f"/dep/hashes/hashList_{i}.txt"
-                if self_.scan_lib.check_hash_in_file(hash_file_path.encode(), hash.encode()):
-                    HashScan_found = True
-                    break
+            hash_file_path = current_dir+f"/dep/hashes/"
+            for file in os.listdir(hash_file_path):
+                if file.endswith(".txt"):
+                    if self_.scan_lib.check_hash_in_file((hash_file_path+file).encode(), hash.encode()):
+                        HashScan_found = True
+                        break
 
             # return result
             return HashScan_found, hash

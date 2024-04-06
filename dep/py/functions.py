@@ -34,9 +34,9 @@ def changePage(self, page, LoadingReason="Loading..."):
         self.stackedWidget.setCurrentIndex(3)
 
          
-def FileDialog(self, MainWindow):
+def FileDialog(self):
     options = QFileDialog.Options()
-    file_path, _ = QFileDialog.getOpenFileName(MainWindow, "Open File", "", "All Files (*);;Text Files (*.txt)", options=options)
+    file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "All Files (*);;Text Files (*.txt)", options=options)
     if os.path.exists(file_path):
         return file_path
     else:
@@ -66,27 +66,21 @@ def ErrorBox(self, Error, def_data, Title="Error"):
 
 def get_Hashes(self, filepath):
     # get the MD5, SHA1 and SHA-256 hash of a file
-    md5_hash = hashlib.md5()
-    sha1_hash = hashlib.sha1()
-    sha256_hash = hashlib.sha256()
+    md5 = hashlib.md5()
+    sha1 = hashlib.sha1()
+    sha256 = hashlib.sha256()
 
     with open(filepath, "rb") as f:
-        # Read the file in chunks to efficiently handle large files
-        chunk = 0
         while chunk := f.read(4096):
-            md5_hash.update(chunk)
-            sha1_hash.update(chunk)
-            sha256_hash.update(chunk)
-
-    return {
-        md5_hash.hexdigest(),
-        sha1_hash.hexdigest(),
-        sha256_hash.hexdigest()
-    }
+            md5.update(chunk)
+            sha1.update(chunk)
+            sha256.update(chunk)
+    # return hashes
+    return md5.hexdigest(), sha1.hexdigest(), sha256.hexdigest()
 
 
-# check if a hash is MD5 using its default length
 def is_MD5_hash(self, hash):
+    # check if a hash is MD5 using its default length
     if len(str(hash)) == 32:
         return True
     else:

@@ -1,10 +1,11 @@
-from PyQt5.QtCore import QRunnable
+from PyQt5.QtCore import QObject, pyqtSignal
 import urllib.request
 import zipfile
 import time
 import os
 
-class HashWorker(QRunnable):
+class HashWorker(QObject):
+    finished = pyqtSignal()
     def __init__(self, self_, current_dir):
         super().__init__()
         self.self_ = self_
@@ -14,18 +15,22 @@ class HashWorker(QRunnable):
         self.self_.changePage("LoadingPage", "Updating Hashes")
         if self.self_.UpdateHashes_checkBox.isChecked():
             self.UpdateHashes_MalwareBazaar()
-        self.self_.changePage("HomePage")
 
+        self.self_.changePage("HomePage")
+        self.finished.emit()
+        return
+    
 
     def UpdateHashes_MalwareBazaar(self):
         MalwareBazaar_hash_path = self.current_dir+f"/dep/hashes/"
+        MalwareBazaar_hash_file = self.current_dir+f"/dep/hashes/MalwareBazaar_hashList.txt"
 
         try:
             # check file edit date if available and if a new one should be updated
             def ShouldUpdate():
-                if os.path.exists(MalwareBazaar_hash_path+"hashList_1.txt"):
+                if os.path.exists(MalwareBazaar_hash_file):
                     # Get the last modification time of the file UNIX
-                    lastEdited_UNIX = os.path.getmtime(MalwareBazaar_hash_path+"hashList_1.txt")
+                    lastEdited_UNIX = os.path.getmtime(MalwareBazaar_hash_file)
                     
                     # get the current time UNIX
                     current_time = time.time()
@@ -60,12 +65,10 @@ class HashWorker(QRunnable):
                         zip_ref.extractall(MalwareBazaar_hash_path)
                         zip_ref.close()
                     
-                    # Rename the extracted file to hashList_1.txt
-                    existing_file = os.path.join(MalwareBazaar_hash_path, 'hashList_1.txt')
-                    # remove if its already existing
-                    if os.path.exists(existing_file):
-                        os.remove(existing_file)
-                    os.rename(MalwareBazaar_hash_path+"full_md5.txt", existing_file)
+                    # Rename the extracted file and delete the old one
+                    if os.path.exists(MalwareBazaar_hash_file):
+                        os.remove(MalwareBazaar_hash_file)
+                    os.rename(MalwareBazaar_hash_path+"full_md5.txt", MalwareBazaar_hash_file)
                 finally:
                     # try to delete the temp zip
                     for i in range(10):
