@@ -14,3 +14,8 @@
 - scanning using hashes from MalwareBazaar
 
 ![image](https://github.com/cookie0o/betterPYAV/assets/81589649/fc6d5ddd-428a-4891-9833-bf175c1a0a4f)
+
+
+### Custom Hashes   
+**Notice: MD5 and .txt only!**   
+Just place your file in: `/dep/hashes/`   
