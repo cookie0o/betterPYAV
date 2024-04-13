@@ -19,8 +19,9 @@
 ### Custom Hashes   
 **Notice: MD5 and .txt only!**   
 Just place your file in: `/dep/hashes/`   
-
-### Machine Learning (ML) Scan Info
+   
+    
+### Machine Learning (ML) Scan Info   
 Base [code](https://github.com/cookie0o/betterPYAV/blob/main/dep/ML/file_algo_check.py) and [Classifiers](https://github.com/cookie0o/betterPYAV/tree/main/dep/ML/classifiers) from:   
 [@Kiinitix](https://github.com/Kiinitix) on GitHub   
 [Kiinitix/Malware-Detection-using-Machine-learning](https://github.com/Kiinitix/Malware-Detection-using-Machine-learning)   
