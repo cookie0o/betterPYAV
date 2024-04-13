@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QThreadPool, QTimer
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 import qdarktheme
 import inspect
 import sys
@@ -22,6 +22,9 @@ from dep.py.settingsfunc import (
 )
 from dep.py.hashUpdate import HashWorker
 from dep.py.scan import ScanWorker
+
+# import algo
+from dep.ML.file_algo_check import file_MLCheck
 
 # outside ui elements
 from dep.ui_elements.dialogs.HashDialog import Ui_HashDialog
@@ -107,6 +110,8 @@ class Constructor(QtWidgets.QWidget, Ui_MainWindow):
         return get_Hashes(self, filepath) 
     def is_MD5_hash(self, hash):
         return is_MD5_hash(self, hash)
+    def file_MLCheck(self, current_dir, filepath):
+        return file_MLCheck(self, current_dir, filepath)
 
 
     def Build(self):
@@ -114,11 +119,13 @@ class Constructor(QtWidgets.QWidget, Ui_MainWindow):
 
         # disable checkBoxes
         self.HashCheck_noInput_checkBox.setEnabled(False)
-        self.HashCheckDetection_noInput_checkBox.setEnabled(False)
         self.Method_HashCheck_checkBox.setEnabled(False)
         self.Method_HashCheck_checkBox.setChecked(True)
         self.VirusTotalCheck_noInput_checkBox.setEnabled(False)
         self.MetaDefenderCheck_noInput_checkBox.setEnabled(False)
+        self.HashCheckDetection_noInput_checkBox.setEnabled(False)
+        self.MLCheck_noInput_checkBox.setEnabled(False)
+        self.MLCheckDetection_noInput_checkBox.setEnabled(False)
         
         # load shared libs and define arg types
         libs(self, current_dir)

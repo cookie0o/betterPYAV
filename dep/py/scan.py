@@ -33,6 +33,7 @@ class ScanTypes():
         HashScan_found = None
         VirusTotal_found = None
         MetaDefender_found = None
+        MLCheck_found = None
 
         try:
             filepath = None
@@ -78,6 +79,13 @@ class ScanTypes():
 
             if self_.Method_MetaDefender_checkBox.isChecked():
                 MetaDefender_found, hash = scanning.MetaDefenderScan(self, self_, current_dir, filepath, hash)
+
+            if self_.Method_MLCheck_checkBox.isChecked():
+                # only scan when a file is selected (a filepath exists) and its a PE (.exe)
+                if filepath != None and filepath.lower().endswith(".exe"):
+                    MLCheck_found, percentage = scanning.MLCheck(self, self_, current_dir, filepath)
+                else:
+                    self_.MLCheckDetection_noInput_checkBox.setText("ML Check")
 
             
             # detection
@@ -170,6 +178,21 @@ class ScanTypes():
                     getattr(self_, f"MetaDefender_{MetaDefender_name[i]}_results_label").setStyleSheet(style_sheet)
 
 
+            if MLCheck_found != None and MLCheck_found != False:
+                self_.MLCheck_noInput_checkBox.setChecked(True)
+                self_.MLCheckDetection_noInput_checkBox.setChecked(True)
+                self_.MLCheckDetection_noInput_checkBox.setStyleSheet("color: red")
+                self_.MLCheckDetection_noInput_checkBox.setText("ML Check "+percentage+"%")
+
+            else:
+                if MLCheck_found == False:
+                    self_.MLCheck_noInput_checkBox.setChecked(True)
+                    self_.MLCheckDetection_noInput_checkBox.setText("ML Check "+percentage+"%")
+                else:
+                    self_.MLCheck_noInput_checkBox.setChecked(False)
+                self_.MLCheckDetection_noInput_checkBox.setChecked(False)
+                self_.MLCheckDetection_noInput_checkBox.setStyleSheet("color: green")    
+
             return
         except Exception as e:
             self_.ErrorBox(e, (self_.def_data()), "Scan Error")
@@ -248,12 +271,16 @@ class scanning():
             if not None in response:
                 total_avs = response["scan_results"]["total_avs"]
                 total_detections = response["scan_results"]["total_detected_avs"] 
+                try:
+                    voteUP = response["votes"]["up"],
+                    voteDOWN = response["votes"]["down"]
+                except:voteUP=0;voteDOWN=0
                 MetaDefender_found = (
                     total_detections,
                     total_avs,
                     str(int((total_detections / total_avs) * 100)),
-                    response["votes"]["up"],
-                    response["votes"]["down"]
+                    voteUP,
+                    voteDOWN
                 )
             else:
                 if response[1] == 400 or response[1] == 404:      
@@ -262,15 +289,36 @@ class scanning():
                         response = MetaDefender_api.File_Scanning(filepath, "", 1, 0, True, key)
                         total_avs = response["scan_results"]["total_avs"]
                         total_detections = response["scan_results"]["total_detected_avs"] 
+                        try:
+                            voteUP = response["votes"]["up"],
+                            voteDOWN = response["votes"]["down"]
+                        except:voteUP=0;voteDOWN=0
                         MetaDefender_found = (
                             total_detections,
                             total_avs,
                             str(int((total_detections / total_avs) * 100)),
-                            response["votes"]["up"],
-                            response["votes"]["down"]
+                            voteUP,
+                            voteDOWN
                         )
             # return result
             return MetaDefender_found, hash
         except Exception as e:
             self_.ErrorBox(e, (self_.def_data()), "Meta Defender Scan Error")
+            return None, None
+        
+    def MLCheck(self, self_, current_dir, filepath=None):
+        MLCheck_found = False
+        try:
+            self_.changePage("LoadingPage", "ML Check")
+
+            MLCheck, percentage_raw = self_.file_MLCheck(current_dir, filepath)
+            if MLCheck == 1:
+                MLCheck_found = True
+            
+            percentage = int(percentage_raw * 100)
+
+            # return result
+            return MLCheck_found, str(percentage)
+        except Exception as e:
+            self_.ErrorBox(e, (self_.def_data()), "ML Check Error")
             return None, None

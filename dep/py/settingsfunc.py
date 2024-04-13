@@ -49,6 +49,7 @@ def Load_settings(self, current_dir):
     HashCheck_Method        = True if str(config.get('Settings', 'HashCheck_Method')).lower() == 'true' else False
     VirusTotal_Method       = True if str(config.get('Settings', 'VirusTotal_Method')).lower() == 'true' else False
     MetaDefender_Method     = True if str(config.get('Settings', 'MetaDefender_Method')).lower() == 'true' else False
+    ML_Method        = True if str(config.get('Settings', 'ML_Method')).lower() == 'true' else False
     # api keys
     VirusTotal_ApiKey       = str(config.get('Settings', 'VirusTotal_ApiKey'))
     MetaDefender_ApiKey     = str(config.get('Settings', 'MetaDefender_ApiKey'))
@@ -65,6 +66,7 @@ def Load_settings(self, current_dir):
     self.Method_HashCheck_checkBox.setChecked(HashCheck_Method)
     self.Method_VirusTotal_checkBox.setChecked(VirusTotal_Method)
     self.Method_MetaDefender_checkBox.setChecked(MetaDefender_Method)
+    self.Method_MLCheck_checkBox.setChecked(ML_Method)
     # api keys
     self.VirusTotal_ApiKey_lineEdit.setText(VirusTotal_ApiKey)
     self.MetaDefender_ApiKey_lineEdit.setText(MetaDefender_ApiKey)
@@ -90,6 +92,7 @@ def SaveApply_settings(self, current_dir):
     config["Settings"]["HashCheck_Method"] = str(self.Method_HashCheck_checkBox.isChecked())
     config["Settings"]["VirusTotal_Method"] = str(self.Method_VirusTotal_checkBox.isChecked())
     config["Settings"]["MetaDefender_Method"] = str(self.Method_MetaDefender_checkBox.isChecked())
+    config["Settings"]["ML_Method"] = str(self.Method_MLCheck_checkBox.isChecked())
     # api keys
     config["Settings"]["VirusTotal_ApiKey"] = str(self.VirusTotal_ApiKey_lineEdit.text())
     config["Settings"]["MetaDefender_ApiKey"] = str(self.MetaDefender_ApiKey_lineEdit.text())
