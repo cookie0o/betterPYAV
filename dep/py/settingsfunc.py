@@ -1,6 +1,5 @@
 from PyQt5 import QtCore
 import configparser
-import qdarktheme
 import os
 
 config = configparser.ConfigParser()
@@ -59,7 +58,7 @@ def Load_settings(self, current_dir):
     
     # apply settings
     # ui
-    qdarktheme.setup_theme(theme)
+    #qdarktheme.setup_theme(theme)
     self.theme_comboBox.setCurrentText(theme)
     self.KeepWindowSizeOnRestart_checkBox.setChecked(KeepWindowSizeOnRestart)
     # methods

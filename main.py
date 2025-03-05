@@ -1,6 +1,5 @@
 from PyQt5.QtCore import QThreadPool, QTimer
 from PyQt5 import QtCore, QtWidgets
-import qdarktheme
 import inspect
 import sys
 import os
@@ -167,11 +166,11 @@ class Constructor(QtWidgets.QWidget, Ui_MainWindow):
 
 def main(appName, appVersion):
     # enable and handle high dpi displays
-    qdarktheme.enable_hi_dpi()
     if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
     if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+
         
     # create application
     app = QtWidgets.QApplication(sys.argv)
