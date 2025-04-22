@@ -84,6 +84,3 @@ class HashWorker(QObject):
         except Exception as e:
             self.self_.ErrorBox(e, (self.self_.def_data()), "MalwareBazaar hash Update Error")
             return
-
-                    
-
