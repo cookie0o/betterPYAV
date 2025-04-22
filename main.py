@@ -126,7 +126,7 @@ class Constructor(QtWidgets.QWidget, Ui_MainWindow):
         self.MLCheck_noInput_checkBox.setEnabled(False)
         self.MLCheckDetection_noInput_checkBox.setEnabled(False)
         
-        # load shared libs and define arg types
+        # load shared libs and define arg types based on system 
         libs(self, current_dir)
         
         # side buttons
